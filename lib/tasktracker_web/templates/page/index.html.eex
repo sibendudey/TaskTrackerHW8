@@ -9,6 +9,8 @@
       <div class="form-group">
         Email
         <input type="email" name="email" placeholder="user@example.com" >
+        Password
+        <input type="password" name="password" placeholder="Enter your password" >
       </div>
       <!-- passwords come later -->
       <div class="form-group">

@@ -4,6 +4,7 @@ defmodule Tasktracker.Accounts do
   """
 
   import Ecto.Query, warn: false
+  import Comeonin.Argon2
   alias Tasktracker.Repo
 
   alias Tasktracker.Accounts.User
@@ -65,8 +66,12 @@ defmodule Tasktracker.Accounts do
 
   """
 
-  def get_user_by_email(email) do
-    Repo.get_by(User, email: email)
+  def get_user_by_email(email, password) do
+    user = Repo.get_by(User, [email: email])
+    case Comeonin.Argon2.check_pass(user, password) do
+      {:ok, user} -> user
+      {:error, message} -> nil
+    end
   end
 
   @doc """
