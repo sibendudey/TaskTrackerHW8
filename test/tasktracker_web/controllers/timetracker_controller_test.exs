@@ -2,6 +2,7 @@ defmodule TasktrackerWeb.TimetrackerControllerTest do
   use TasktrackerWeb.ConnCase
 
   alias Tasktracker.TaskManager
+  alias Tasktracker.TaskManager.Timetracker
 
   @create_attrs %{time: 42}
   @update_attrs %{time: 43}
@@ -12,60 +13,50 @@ defmodule TasktrackerWeb.TimetrackerControllerTest do
     timetracker
   end
 
+  setup %{conn: conn} do
+    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+  end
+
   describe "index" do
     test "lists all timetrackers", %{conn: conn} do
       conn = get conn, timetracker_path(conn, :index)
-      assert html_response(conn, 200) =~ "Listing Timetrackers"
-    end
-  end
-
-  describe "new timetracker" do
-    test "renders form", %{conn: conn} do
-      conn = get conn, timetracker_path(conn, :new)
-      assert html_response(conn, 200) =~ "New Timetracker"
+      assert json_response(conn, 200)["data"] == []
     end
   end
 
   describe "create timetracker" do
-    test "redirects to show when data is valid", %{conn: conn} do
+    test "renders timetracker when data is valid", %{conn: conn} do
       conn = post conn, timetracker_path(conn, :create), timetracker: @create_attrs
-
-      assert %{id: id} = redirected_params(conn)
-      assert redirected_to(conn) == timetracker_path(conn, :show, id)
+      assert %{"id" => id} = json_response(conn, 201)["data"]
 
       conn = get conn, timetracker_path(conn, :show, id)
-      assert html_response(conn, 200) =~ "Show Timetracker"
+      assert json_response(conn, 200)["data"] == %{
+        "id" => id,
+        "time" => 42}
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post conn, timetracker_path(conn, :create), timetracker: @invalid_attrs
-      assert html_response(conn, 200) =~ "New Timetracker"
-    end
-  end
-
-  describe "edit timetracker" do
-    setup [:create_timetracker]
-
-    test "renders form for editing chosen timetracker", %{conn: conn, timetracker: timetracker} do
-      conn = get conn, timetracker_path(conn, :edit, timetracker)
-      assert html_response(conn, 200) =~ "Edit Timetracker"
+      assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
   describe "update timetracker" do
     setup [:create_timetracker]
 
-    test "redirects when data is valid", %{conn: conn, timetracker: timetracker} do
+    test "renders timetracker when data is valid", %{conn: conn, timetracker: %Timetracker{id: id} = timetracker} do
       conn = put conn, timetracker_path(conn, :update, timetracker), timetracker: @update_attrs
-      assert redirected_to(conn) == timetracker_path(conn, :show, timetracker)
+      assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
-      conn = get conn, timetracker_path(conn, :show, timetracker)
-      assert html_response(conn, 200)
+      conn = get conn, timetracker_path(conn, :show, id)
+      assert json_response(conn, 200)["data"] == %{
+        "id" => id,
+        "time" => 43}
     end
 
     test "renders errors when data is invalid", %{conn: conn, timetracker: timetracker} do
       conn = put conn, timetracker_path(conn, :update, timetracker), timetracker: @invalid_attrs
-      assert html_response(conn, 200) =~ "Edit Timetracker"
+      assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
@@ -74,7 +65,7 @@ defmodule TasktrackerWeb.TimetrackerControllerTest do
 
     test "deletes chosen timetracker", %{conn: conn, timetracker: timetracker} do
       conn = delete conn, timetracker_path(conn, :delete, timetracker)
-      assert redirected_to(conn) == timetracker_path(conn, :index)
+      assert response(conn, 204)
       assert_error_sent 404, fn ->
         get conn, timetracker_path(conn, :show, timetracker)
       end

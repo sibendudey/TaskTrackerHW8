@@ -67,10 +67,13 @@ defmodule Tasktracker.Accounts do
   """
 
   def get_user_by_email(email, password) do
-    user = Repo.get_by(User, [email: email])
-    case Comeonin.Argon2.check_pass(user, password) do
-      {:ok, user} -> user
-      {:error, message} -> nil
+    case user = Repo.get_by(User, [email: email]) do
+      nil -> {:error, :not_found}
+      _ -> case Comeonin.Argon2.check_pass(user, password) do
+             {:ok, user} -> {:ok, user}
+             {:error, message} -> IO.puts "Password authentication unsuccessful"
+                                {:error, "Login Not Successful"}
+           end
     end
   end
 
@@ -120,4 +123,5 @@ defmodule Tasktracker.Accounts do
   def change_user(%User{} = user) do
     User.changeset(user, %{})
   end
+
 end

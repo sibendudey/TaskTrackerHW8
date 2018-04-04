@@ -26,4 +26,3 @@ defmodule Tasktracker.Accounts.User do
   defp put_pass_hash(changeset), do: changeset
 end
 
-
