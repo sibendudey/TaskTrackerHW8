@@ -24,8 +24,7 @@ class TheServer {
     }
 
     create_task(data, token) {
-        console.log("Data is called");
-        console.log(data);
+
         $.ajax("/api/v1/tasks", {
             method: "post",
             dataType: "json",

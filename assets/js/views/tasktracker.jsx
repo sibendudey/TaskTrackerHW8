@@ -92,7 +92,7 @@ function TaskItem(props) {
                 </FormGroup>
                 <FormGroup>
                     <Label for="user_id">Assigned To:</Label>
-                    <Input type="select" name="user_id" value={props.task.user_id}
+                    <Input type="select" name="user_id" defaultValue={props.task.user_id}
                            disabled={props.task.completed} onChange={update}>
                         {props.users.map(user => {
                             return <option value={user.id}>{user.name}</option>

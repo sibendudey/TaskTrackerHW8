@@ -6,14 +6,29 @@ defmodule TasktrackerWeb.TaskController do
 
   action_fallback TasktrackerWeb.FallbackController
 
-  def index(conn, %{ "token" => %{ "token" => token}}) do
+  def index(
+        conn,
+        %{
+          "token" => %{
+            "token" => token
+          }
+        }
+      ) do
     with {:ok, user_id} = Phoenix.Token.verify(conn, "auth token", token, max_age: 86400) do
       tasks = Tasktracker.TaskManager.get_task_by_user_id(user_id)
       render(conn, "index.json", tasks: tasks)
     end
   end
 
-  def create(conn, %{"task" => task_params, "token" => %{ "token" => token }}) do
+  def create(
+        conn,
+        %{
+          "task" => task_params,
+          "token" => %{
+            "token" => token
+          }
+        }
+      ) do
 
     with {:ok, user_id} = Phoenix.Token.verify(conn, "auth token", token, max_age: 86400) do
       time_spent = Map.get(task_params, "time spent")
@@ -28,7 +43,7 @@ defmodule TasktrackerWeb.TaskController do
         %{"0" => %{}}
         |> Map.put("0", tasktracker_params)
       )
-#      task_params = Map.put(task_params, "user_id", user_id)
+      #      task_params = Map.put(task_params, "user_id", user_id)
       with {:ok, %Task{} = task} <- TaskManager.create_task(task_params) do
         tasks = Tasktracker.TaskManager.get_task_by_user_id(user_id)
         conn
@@ -43,14 +58,38 @@ defmodule TasktrackerWeb.TaskController do
     render(conn, "show.json", task: task)
   end
 
-  def update(conn, %{"id" => id, "task" => task_params, "token" => %{ "token" => token }}) do
+  def update(
+        conn,
+        %{
+          "id" => id,
+          "task" => task_params,
+          "token" => %{
+            "token" => token
+          }
+        }
+      ) do
 
     with {:ok, user_id} = Phoenix.Token.verify(conn, "auth token", token, max_age: 86400) do
+
       task = TaskManager.get_task!(Map.get(task_params, "id"))
 
+      time = Map.get(task_params, "time spent")
       with {:ok, %Task{} = task} <- TaskManager.update_task(task, task_params) do
-        tasks = Tasktracker.TaskManager.get_task_by_user_id(user_id)
+        timetracker = TaskManager.get_timetracker_by_post_id_and_user_id(id, task.user_id)
 
+        if timetracker == nil do
+          task_with_timetracker = Ecto.build_assoc(task, :timetrackers)
+          TaskManager.create_timetracker_with_post(
+            task_with_timetracker,
+            %{"user_id" => task.user_id, "task_id" => task.id}
+          )
+        else
+          if timetracker.user_id == user_id do
+            TaskManager.update_timetracker(timetracker, %{"time" => time})
+          end
+        end
+
+        tasks = Tasktracker.TaskManager.get_task_by_user_id(user_id)
         conn
         |> put_status(:ok)
         |> render("index.json", tasks: tasks)
@@ -58,7 +97,15 @@ defmodule TasktrackerWeb.TaskController do
     end
   end
 
-  def delete(conn, %{"id" => id, "token" => %{ "token" => token}}) do
+  def delete(
+        conn,
+        %{
+          "id" => id,
+          "token" => %{
+            "token" => token
+          }
+        }
+      ) do
     with {:ok, user_id} = Phoenix.Token.verify(conn, "auth token", token, max_age: 86400) do
       task = TaskManager.get_task!(id)
       with {:ok, %Task{}} <- TaskManager.delete_task(task) do
