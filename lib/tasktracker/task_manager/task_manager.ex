@@ -59,7 +59,6 @@ defmodule Tasktracker.TaskManager do
   def get_task_by_user_id(user_id) do
     query = from t in Task, where: t.user_id == ^user_id
     Repo.all(query)
-    |> Repo.preload(:user)
     |> Repo.preload(timetrackers:  from(tt in Timetracker, where: tt.user_id == ^user_id))
   end
 

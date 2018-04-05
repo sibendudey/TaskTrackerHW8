@@ -50,10 +50,10 @@ function Nav(props) {
         session_info = <Session token={props.token} />;
         navigation = <ul className="navbar-nav mr-auto">
             <NavItem>
-                <NavLink to="/" exact={true} activeClassName="active" className="nav-link">Feed</NavLink>
+                <NavLink to="/" href="#" className="nav-link">Home Page</NavLink>
             </NavItem>
             <NavItem>
-                <NavLink to="/users" href="#" className="nav-link">All Users</NavLink>
+                <NavLink to="/tasks" href="#" className="nav-link">Task Feed</NavLink>
             </NavItem>
         </ul>;
     }

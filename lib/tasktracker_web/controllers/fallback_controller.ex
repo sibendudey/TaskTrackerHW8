@@ -23,4 +23,16 @@ defmodule TasktrackerWeb.FallbackController do
     |> put_status(:unprocessable_entity)
     |> render(TasktrackerWeb.ErrorView, :"404")
   end
+
+  def call(conn, {:error, :invalid}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> render(TasktrackerWeb.ErrorView, :"404")
+  end
+
+  def call(conn, {:error, :expired}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> render(TasktrackerWeb.ErrorView, :"404")
+  end
 end

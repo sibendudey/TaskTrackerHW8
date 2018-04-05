@@ -33,8 +33,27 @@ function register(state = {}, action)   {
     }
 }
 
+function users(state= [], action)   {
+    switch (action.type) {
+        case 'USERS_LIST':
+            return [...action.data];
+        default:
+            return state;
+    }
+}
+
+
+function tasks(state = [], action) {
+    switch (action.type)    {
+        case 'TASKS_LIST':
+            return [...action.data];
+        default:
+            return state;
+    }
+}
+
 function root_reducer(state0, action) {
-    let reducer = combineReducers({token, login, register});
+    let reducer = combineReducers({token, login, register, tasks, users});
     let state1 = reducer(state0, action);
     return state1;
 }
