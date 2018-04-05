@@ -37,8 +37,14 @@ let LoginForm = connect(({login}) => {return {login};})((props) => {
 });
 
 let Session = connect(({token}) => {return {token};})((props) => {
+    function logout()   {
+        props.dispatch({
+            type: "DELETE_TOKEN",
+        });
+    }
     return <div className="navbar-text">
         Welcome { props.token.user_name }
+        <Button onClick={logout}>Logout</Button>
     </div>;
 });
 

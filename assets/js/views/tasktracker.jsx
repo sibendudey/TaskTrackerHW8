@@ -4,7 +4,9 @@ import Nav from './Nav';
 import ReactDOM from 'react-dom';
 import {BrowserRouter as Router, Route} from 'react-router-dom';
 import api from "../api/api";
-import {Form, FormGroup, NavItem, Input, Button, Label} from 'reactstrap';
+import {Form, FormGroup, Input, Button, Label} from 'reactstrap';
+import {Card, CardBody} from 'reactstrap';
+
 
 // Starter code attribution : Professor Nat Tuck
 
@@ -32,7 +34,7 @@ let Tasktracker = connect((state) => state)((props) => {
     );
 });
 
-function TaskFeed(props){
+function TaskFeed(props) {
     console.log("Task Feed is rendered");
     console.log(props.tasks);
     let taskItems = props.tasks.map(task => {
@@ -41,21 +43,7 @@ function TaskFeed(props){
 
     return <div>
         <CreateTaskItem users={props.users} token={props.token}/>
-        <table className="table">
-            <thead>
-            <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Completed</th>
-                <th>Time Taken</th>
-                <th> </th>
-                <th> </th>
-            </tr>
-            </thead>
-            <tbody>
-            {taskItems}
-            </tbody>
-        </table>
+        {taskItems}
     </div>;
 }
 
@@ -63,64 +51,69 @@ function TaskFeed(props){
 function TaskItem(props) {
     console.log(props.users);
     let data = {};
-    function update(ev)   {
+
+    function update(ev) {
         let tgt = $(ev.target);
-        if (tgt.attr('name') === "completed")   {
-            data[tgt.attr('name')] = tgt.val() === "on";
+        if (tgt.attr('name') === "completed") {
+            data[tgt.attr('name')] = tgt.is(':checked');
+            console.log(data[tgt.attr('name')]);
         }
         else
             data[tgt.attr('name')] = tgt.val();
     }
 
-    function edit_task(id)    {
+    function edit_task(id) {
         data["id"] = id;
         api.update_task(data, props.token);
     }
 
-    function delete_task(id)  {
+    function delete_task(id) {
         api.delete_task(id, props.token);
     }
 
-    return <tr>
-        <Form inline>
-        <FormGroup>
-            <Input type="hidden" name="id" defaultValue={props.task.id} onChange={update}/>
-        </FormGroup>
-        <FormGroup>
-            <Input type="text" name="title" placeholder="title" defaultValue={props.task.title} onChange={update}/>
-        </FormGroup>
-            <td>
-        <FormGroup>
-            <Input type="text" name="description" placeholder="description" defaultValue={props.task.description}
-                   onChange={update}/>
-        </FormGroup>
-            </td>
-            <td>
+    return <Card>
+        <CardBody>
+            <Form>
                 <FormGroup>
+                    <Input type="hidden" name="id" defaultValue={props.task.id} onChange={update}/>
+                </FormGroup>
+                <FormGroup>
+                    <Label for="title">Title:</Label>
+                    <Input type="text" name="title" placeholder="title" defaultValue={props.task.title}
+                           onChange={update}
+                           disabled={props.task.completed}/>
+                </FormGroup>
+                <FormGroup>
+                    <Label for="completed">Description:</Label>
+                    <Input type="text" name="description" placeholder="description"
+                           defaultValue={props.task.description}
+                           onChange={update}
+                           disabled={props.task.completed}/>
+                </FormGroup>
+                <FormGroup>
+                    <Label for="user_id">Assigned To:</Label>
                     <Input type="select" name="user_id" value={props.task.user_id}
-                           onChange={update}>
-                        { props.users.map( user => {
+                           disabled={props.task.completed} onChange={update}>
+                        {props.users.map(user => {
                             return <option value={user.id}>{user.name}</option>
-                        }) }
+                        })}
                     </Input>
                 </FormGroup>
-            </td>
-            <td>
-        <FormGroup>
-            <Input type="checkbox" name="completed" defaultChecked={props.task.completed} />
-        </FormGroup>
-            </td>
-            <td>
-        <FormGroup>
-            <Input type="text" name="Time Spent" defaultValue={props.task.timetrackers[0].time}
-                   onChange={update}/>
-        </FormGroup>
-            </td>
-            <td>
-        <Button onClick={() => edit_task(props.task.id)}>Edit Task</Button>
-        <Button onClick={() => delete_task(props.task.id)}>Delete Task</Button>
-            </td>
-    </Form></tr>;
+                <FormGroup>
+                    <Label for="completed">Completed: </Label>
+                    <Input type="checkbox" name="completed" disabled={props.task.completed} defaultChecked={props.task.completed}
+                           onChange={update}/>
+                </FormGroup>
+                <FormGroup>
+                    <Label for="">Time spent:</Label>
+                    <Input type="text" name="time spent" disabled={props.task.completed} defaultValue={props.task.timetrackers[0].time}
+                           onChange={update}/>
+                </FormGroup>
+                <Button disabled={props.task.completed} onClick={() => {edit_task(props.task.id)}}>Edit Task</Button>
+                <Button onClick={() => delete_task(props.task.id)}>Delete Task</Button>
+            </Form>
+        </CardBody>
+    </Card>;
 }
 
 function CreateTaskItem(props) {
@@ -133,8 +126,9 @@ function CreateTaskItem(props) {
 
     function on_change(ev) {
         let tgt = $(ev.target);
-        if (tgt.attr('name') === "completed")   {
-            data[tgt.attr('name')] = tgt.val() === "on";
+        if (tgt.attr('name') === "completed") {
+            data[tgt.attr('name')] = tgt.is(':checked');
+            console.log(data[tgt.attr('name')]);
         }
         else
             data[tgt.attr('name')] = tgt.val();
@@ -150,16 +144,17 @@ function CreateTaskItem(props) {
                 <Input type="text" name="description" placeholder="description" defaultValue={""} onChange={on_change}/>
             </FormGroup>
             <FormGroup>
-                <Input type="select" name="user_id" value="select_user" onChange={on_change}>
+                <Input type="select" name="user_id" defaultValue="select_user" onChange={on_change}>
                     <option value="select_user"></option>
-                    { props.users.map( user => {
+                    {props.users.map(user => {
                         return <option key={user.id} value={user.id}>{user.name}</option>
-                    }) }
+                    })}
                 </Input>
             </FormGroup>
             <FormGroup>
-                <Label for="completed">Task Progress:</Label>
-                <Input type="checkbox" name="completed" defaultChecked={""} onChange={on_change}/>
+                <Label for="completed">Completed:
+                    <Input type="checkbox" name="completed" defaultChecked={""} onChange={on_change} />
+                </Label>
             </FormGroup>
             <FormGroup>
                 <Input type="text" name="time spent" defaultValue={""} placeholder="Time spent" onChange={on_change}/>

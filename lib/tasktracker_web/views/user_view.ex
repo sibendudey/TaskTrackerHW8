@@ -20,6 +20,7 @@ defmodule TasktrackerWeb.UserView do
     %{
       user_id: user.id,
       token: token,
+      user_name: user.name
     }
   end
 end
