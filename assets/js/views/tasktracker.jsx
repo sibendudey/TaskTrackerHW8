@@ -7,9 +7,7 @@ import api from "../api/api";
 import {Form, FormGroup, Input, Button, Label} from 'reactstrap';
 import {Card, CardBody} from 'reactstrap';
 
-
 // Starter code attribution : Professor Nat Tuck
-
 let Tasktracker = connect((state) => state)((props) => {
     return (
         <Router>
@@ -21,7 +19,7 @@ let Tasktracker = connect((state) => state)((props) => {
                     else return <div>You are not logged in</div>
                 }}/>
                 <Route path="/tasks" exact={true} render={() => {
-                    console.log(props.users);
+
                     return <div>
                         <TaskFeed users={props.users} token={props.token} tasks={props.tasks}/>
                     </div>;
@@ -35,8 +33,6 @@ let Tasktracker = connect((state) => state)((props) => {
 });
 
 function TaskFeed(props) {
-    console.log("Task Feed is rendered");
-    console.log(props.tasks);
     let taskItems = props.tasks.map(task => {
         return <TaskItem key={task.id} users={props.users} task={task} token={props.token}/>
     });
@@ -49,14 +45,13 @@ function TaskFeed(props) {
 
 
 function TaskItem(props) {
-    console.log(props.users);
+
     let data = {};
 
     function update(ev) {
         let tgt = $(ev.target);
         if (tgt.attr('name') === "completed") {
             data[tgt.attr('name')] = tgt.is(':checked');
-            console.log(data[tgt.attr('name')]);
         }
         else
             data[tgt.attr('name')] = tgt.val();
@@ -128,7 +123,6 @@ function CreateTaskItem(props) {
         let tgt = $(ev.target);
         if (tgt.attr('name') === "completed") {
             data[tgt.attr('name')] = tgt.is(':checked');
-            console.log(data[tgt.attr('name')]);
         }
         else
             data[tgt.attr('name')] = tgt.val();

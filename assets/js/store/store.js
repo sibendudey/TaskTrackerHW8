@@ -17,7 +17,6 @@ function login(state = {}, action) {
         case 'UPDATE_LOGIN_FORM':
             return Object.assign({}, state, action.data);
         case 'RESET_LOGIN_FORM':
-            console.log(action);
             return Object.assign({}, state, action.data);
         default:
             return state;
