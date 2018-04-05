@@ -34,6 +34,7 @@ class TheServer {
             }),
             contentType: "application/json; charset=UTF-8",
             success: (resp) => {
+                window.alert("Task has been created");
                 store.dispatch({
                     type: 'TASKS_LIST',
                     data: resp.data,
@@ -55,6 +56,7 @@ class TheServer {
             }),
             contentType: "application/json; charset=UTF-8",
             success: (resp) => {
+                window.alert("Task has been updated");
                 store.dispatch({
                     type: 'TASKS_LIST',
                     data: resp.data,
@@ -75,6 +77,7 @@ class TheServer {
             }),
             contentType: "application/json; charset=UTF-8",
             success: (resp) => {
+                window.alert("Task has been deleted");
                 store.dispatch({
                     type: 'TASKS_LIST',
                     data: resp.data,
